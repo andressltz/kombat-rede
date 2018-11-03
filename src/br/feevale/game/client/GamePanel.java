@@ -1,8 +1,13 @@
 package br.feevale.game.client;
 
-public class GamePanel extends javax.swing.JFrame {
 
+import java.awt.event.KeyEvent;
+
+public class GamePanel extends javax.swing.JFrame implements Runnable {
+
+    public static final int SPEED = 4;
     Player player;
+    boolean keyRight = false;
 
     /**
      * Creates new form GamePanel
@@ -44,7 +49,8 @@ public class GamePanel extends javax.swing.JFrame {
                 GamePanel g = new GamePanel();
                 g.setSize(800, 600);
                 g.setVisible(true);
-
+                Thread game = new Thread(g);
+                game.start();
             }
         });
     }
@@ -80,16 +86,17 @@ public class GamePanel extends javax.swing.JFrame {
 
     private void formKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_formKeyPressed
         // TODO add your handling code here:
-        player.x++;
-        player.y++;
-        player.move();
+        if (evt.getKeyCode() == KeyEvent.VK_RIGHT) {
+            keyRight = true;
+        }
+//        player.move();
     }//GEN-LAST:event_formKeyPressed
 
     private void formKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_formKeyReleased
         // TODO add your handling code here:
-        player.x--;
-        player.y--;
-        player.move();
+        if (evt.getKeyCode() == KeyEvent.VK_RIGHT) {
+            keyRight = false;
+        }
     }//GEN-LAST:event_formKeyReleased
 
     private void formWindowOpened(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowOpened
@@ -99,6 +106,26 @@ public class GamePanel extends javax.swing.JFrame {
         getContentPane().add(player);
         repaint();
     }//GEN-LAST:event_formWindowOpened
+
+    public void updateGame() {
+        if (keyRight) {
+            player.x += SPEED;
+            player.move();
+        }
+    }
+
+    @Override
+    public void run() {
+        try {
+            while (true) {
+                updateGame();
+                Thread.sleep(20);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     // End of variables declaration//GEN-END:variables
