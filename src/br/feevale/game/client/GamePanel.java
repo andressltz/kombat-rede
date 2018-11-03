@@ -8,42 +8,15 @@ public class GamePanel extends javax.swing.JFrame implements Runnable {
     public static final int SPEED = 4;
     Player player;
     boolean keyRight = false;
+    boolean keyLeft = false;
+    boolean keyUp = false;
+    boolean keyDown = false;
 
-    /**
-     * Creates new form GamePanel
-     */
     public GamePanel() {
         initComponents();
     }
 
-    /**
-     * @param args the command line arguments
-     */
     public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(GamePanel.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(GamePanel.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(GamePanel.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(GamePanel.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-
-        /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 GamePanel g = new GamePanel();
@@ -84,32 +57,77 @@ public class GamePanel extends javax.swing.JFrame implements Runnable {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void formKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_formKeyPressed
-        // TODO add your handling code here:
-        if (evt.getKeyCode() == KeyEvent.VK_RIGHT) {
-            keyRight = true;
-        }
-//        player.move();
-    }//GEN-LAST:event_formKeyPressed
-
-    private void formKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_formKeyReleased
-        // TODO add your handling code here:
-        if (evt.getKeyCode() == KeyEvent.VK_RIGHT) {
-            keyRight = false;
-        }
-    }//GEN-LAST:event_formKeyReleased
-
-    private void formWindowOpened(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowOpened
-        // TODO add your handling code here:
+    private void formWindowOpened(java.awt.event.WindowEvent evt) {
         player = new Player();
         player.setup();
         getContentPane().add(player);
         repaint();
-    }//GEN-LAST:event_formWindowOpened
+    }
+
+    private void formKeyPressed(java.awt.event.KeyEvent evt) {
+        if (isKeyPressDown(evt.getKeyCode())) {
+            keyDown = true;
+            keyUp = false;
+            keyLeft = false;
+            keyRight = false;
+        } else if (isKeyPressUp(evt.getKeyCode())) {
+            keyDown = false;
+            keyUp = true;
+            keyLeft = false;
+            keyRight = false;
+        } else if (isKeyPressLeft(evt.getKeyCode())) {
+            keyDown = false;
+            keyUp = false;
+            keyLeft = true;
+            keyRight = false;
+        } else if (isKeyPressRight(evt.getKeyCode())) {
+            keyDown = false;
+            keyUp = false;
+            keyLeft = false;
+            keyRight = true;
+        }
+    }
+
+    private void formKeyReleased(java.awt.event.KeyEvent evt) {
+//        if (isKeyPressDown(evt.getKeyCode())) {
+//            keyDown = false;
+//            keyUp = true;
+//            keyLeft = true;
+//            keyRight = true;
+//        } else if (isKeyPressUp(evt.getKeyCode())) {
+//            keyDown = true;
+//            keyUp = false;
+//            keyLeft = true;
+//            keyRight = true;
+//        } else if (isKeyPressLeft(evt.getKeyCode())) {
+//            keyDown = true;
+//            keyUp = true;
+//            keyLeft = false;
+//            keyRight = true;
+//        } else if (isKeyPressRight(evt.getKeyCode())) {
+//            keyDown = true;
+//            keyUp = true;
+//            keyLeft = true;
+//            keyRight = false;
+//        }
+        keyDown = false;
+        keyUp = false;
+        keyLeft = false;
+        keyRight = false;
+    }
 
     public void updateGame() {
         if (keyRight) {
             player.x += SPEED;
+            player.move();
+        } else if (keyLeft) {
+            player.x -= SPEED;
+            player.move();
+        } else if (keyUp) {
+            player.y -= SPEED;
+            player.move();
+        } else if (keyDown) {
+            player.y += SPEED;
             player.move();
         }
     }
@@ -127,7 +145,21 @@ public class GamePanel extends javax.swing.JFrame implements Runnable {
 
     }
 
-    // Variables declaration - do not modify//GEN-BEGIN:variables
-    // End of variables declaration//GEN-END:variables
+    private boolean isKeyPressUp(int keyCode) {
+        return keyCode == KeyEvent.VK_UP;
+    }
+
+    private boolean isKeyPressDown(int keyCode) {
+        return keyCode == KeyEvent.VK_DOWN;
+    }
+
+    private boolean isKeyPressLeft(int keyCode) {
+        return keyCode == KeyEvent.VK_LEFT;
+    }
+
+    private boolean isKeyPressRight(int keyCode) {
+        return keyCode == KeyEvent.VK_RIGHT;
+    }
+
 }
 
