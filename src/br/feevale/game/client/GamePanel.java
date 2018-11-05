@@ -1,16 +1,31 @@
 package br.feevale.game.client;
 
 
+import javax.swing.*;
 import java.awt.event.KeyEvent;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.net.Socket;
 
 public class GamePanel extends javax.swing.JFrame implements Runnable {
 
-    public static final int SPEED = 4;
+    private static final int SPEED = 4;
+    private static final int SERVER_PORT = 8181;
+    private static final String SERVER_HOST = "localhost";
+
     Player player;
+    PrintWriter writer;
+    Socket socket;
+    BufferedReader reader;
+
     boolean keyRight = false;
     boolean keyLeft = false;
     boolean keyUp = false;
     boolean keyDown = false;
+    boolean isKeyPressed = false;
+    int keyPressed;
 
     public GamePanel() {
         initComponents();
@@ -20,12 +35,33 @@ public class GamePanel extends javax.swing.JFrame implements Runnable {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 GamePanel g = new GamePanel();
+                g.connect();
                 g.setSize(800, 600);
-                g.setVisible(true);
+                g.setVisible(true); //TODO: close on error
                 Thread game = new Thread(g);
                 game.start();
+//                while (true) {
+//                    g.receive();
+//                }
             }
         });
+    }
+
+    private boolean connect() {
+        try {
+            socket = new Socket(SERVER_HOST, SERVER_PORT);
+            writer = new PrintWriter(socket.getOutputStream());
+            reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+
+            CommunicateThread c = new CommunicateThread(socket);
+            c.communicate();
+            c.start();
+            return true;
+        } catch (IOException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Erro ao conectar com o servidor: " + e.getLocalizedMessage());
+            return false;
+        }
     }
 
     /**
@@ -40,7 +76,7 @@ public class GamePanel extends javax.swing.JFrame implements Runnable {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowOpened(java.awt.event.WindowEvent evt) {
-                formWindowOpened(evt);
+                formWindowOpened();
             }
         });
         addKeyListener(new java.awt.event.KeyAdapter() {
@@ -49,7 +85,7 @@ public class GamePanel extends javax.swing.JFrame implements Runnable {
             }
 
             public void keyReleased(java.awt.event.KeyEvent evt) {
-                formKeyReleased(evt);
+                formKeyReleased();
             }
         });
         getContentPane().setLayout(null);
@@ -57,7 +93,7 @@ public class GamePanel extends javax.swing.JFrame implements Runnable {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void formWindowOpened(java.awt.event.WindowEvent evt) {
+    private void formWindowOpened() {
         player = new Player();
         player.setup();
         getContentPane().add(player);
@@ -65,6 +101,8 @@ public class GamePanel extends javax.swing.JFrame implements Runnable {
     }
 
     private void formKeyPressed(java.awt.event.KeyEvent evt) {
+        isKeyPressed = true;
+        keyPressed = evt.getKeyCode();
         if (isKeyPressDown(evt.getKeyCode())) {
             keyDown = true;
             keyUp = false;
@@ -88,35 +126,14 @@ public class GamePanel extends javax.swing.JFrame implements Runnable {
         }
     }
 
-    private void formKeyReleased(java.awt.event.KeyEvent evt) {
-//        if (isKeyPressDown(evt.getKeyCode())) {
-//            keyDown = false;
-//            keyUp = true;
-//            keyLeft = true;
-//            keyRight = true;
-//        } else if (isKeyPressUp(evt.getKeyCode())) {
-//            keyDown = true;
-//            keyUp = false;
-//            keyLeft = true;
-//            keyRight = true;
-//        } else if (isKeyPressLeft(evt.getKeyCode())) {
-//            keyDown = true;
-//            keyUp = true;
-//            keyLeft = false;
-//            keyRight = true;
-//        } else if (isKeyPressRight(evt.getKeyCode())) {
-//            keyDown = true;
-//            keyUp = true;
-//            keyLeft = true;
-//            keyRight = false;
-//        }
+    private void formKeyReleased() {
         keyDown = false;
         keyUp = false;
         keyLeft = false;
         keyRight = false;
     }
 
-    public void updateGame() {
+    private void updateGame() {
         if (keyRight) {
             player.x += SPEED;
             player.move();
@@ -130,7 +147,24 @@ public class GamePanel extends javax.swing.JFrame implements Runnable {
             player.y += SPEED;
             player.move();
         }
+        if (isKeyPressed) {
+            System.out.println("Apertei a tecla " + keyPressed);
+            writer.println(keyPressed);
+            writer.flush();
+            isKeyPressed = false;
+        }
     }
+
+//    private void receive() {
+//        try {
+//            String receive;
+//            while ((receive = reader.readLine()) != null) {
+//                System.out.println(receive);
+//            }
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//    }
 
     @Override
     public void run() {
@@ -142,7 +176,6 @@ public class GamePanel extends javax.swing.JFrame implements Runnable {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
 
     private boolean isKeyPressUp(int keyCode) {
