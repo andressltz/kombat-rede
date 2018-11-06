@@ -15,17 +15,18 @@ public class GamePanel extends javax.swing.JFrame implements Runnable {
     private static final int SERVER_PORT = 8181;
     private static final String SERVER_HOST = "localhost";
 
-    Player player;
-    PrintWriter writer;
-    Socket socket;
-    BufferedReader reader;
+    private Player player;
+    private PrintWriter writer;
+    private Socket socket;
+    private BufferedReader reader;
 
-    boolean keyRight = false;
-    boolean keyLeft = false;
-    boolean keyUp = false;
-    boolean keyDown = false;
-    boolean isKeyPressed = false;
-    int keyPressed;
+    public static boolean keyRight = false;
+    public static boolean keyLeft = false;
+    public static boolean keyUp = false;
+    public static boolean keyDown = false;
+    private boolean isKeyPressed = false;
+    private boolean isKeyRealeased = false;
+    private int keyPressed;
 
     public GamePanel() {
         initComponents();
@@ -40,9 +41,6 @@ public class GamePanel extends javax.swing.JFrame implements Runnable {
                 g.setVisible(true); //TODO: close on error
                 Thread game = new Thread(g);
                 game.start();
-//                while (true) {
-//                    g.receive();
-//                }
             }
         });
     }
@@ -103,34 +101,10 @@ public class GamePanel extends javax.swing.JFrame implements Runnable {
     private void formKeyPressed(java.awt.event.KeyEvent evt) {
         isKeyPressed = true;
         keyPressed = evt.getKeyCode();
-        if (isKeyPressDown(evt.getKeyCode())) {
-            keyDown = true;
-            keyUp = false;
-            keyLeft = false;
-            keyRight = false;
-        } else if (isKeyPressUp(evt.getKeyCode())) {
-            keyDown = false;
-            keyUp = true;
-            keyLeft = false;
-            keyRight = false;
-        } else if (isKeyPressLeft(evt.getKeyCode())) {
-            keyDown = false;
-            keyUp = false;
-            keyLeft = true;
-            keyRight = false;
-        } else if (isKeyPressRight(evt.getKeyCode())) {
-            keyDown = false;
-            keyUp = false;
-            keyLeft = false;
-            keyRight = true;
-        }
     }
 
     private void formKeyReleased() {
-        keyDown = false;
-        keyUp = false;
-        keyLeft = false;
-        keyRight = false;
+        isKeyRealeased = true;
     }
 
     private void updateGame() {
@@ -148,23 +122,20 @@ public class GamePanel extends javax.swing.JFrame implements Runnable {
             player.move();
         }
         if (isKeyPressed) {
-            System.out.println("Apertei a tecla " + keyPressed);
+            System.out.println("updateGame() - Apertei a tecla " + keyPressed);
             writer.println(keyPressed);
             writer.flush();
             isKeyPressed = false;
+            isKeyRealeased = false;
+        }
+        if (isKeyRealeased) {
+            System.out.println("updateGame() - Soltei a tecla " + keyPressed);
+            writer.println("keyReleased");
+            writer.flush();
+            isKeyPressed = false;
+            isKeyRealeased = false;
         }
     }
-
-//    private void receive() {
-//        try {
-//            String receive;
-//            while ((receive = reader.readLine()) != null) {
-//                System.out.println(receive);
-//            }
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//    }
 
     @Override
     public void run() {
@@ -176,22 +147,6 @@ public class GamePanel extends javax.swing.JFrame implements Runnable {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    private boolean isKeyPressUp(int keyCode) {
-        return keyCode == KeyEvent.VK_UP;
-    }
-
-    private boolean isKeyPressDown(int keyCode) {
-        return keyCode == KeyEvent.VK_DOWN;
-    }
-
-    private boolean isKeyPressLeft(int keyCode) {
-        return keyCode == KeyEvent.VK_LEFT;
-    }
-
-    private boolean isKeyPressRight(int keyCode) {
-        return keyCode == KeyEvent.VK_RIGHT;
     }
 
 }
