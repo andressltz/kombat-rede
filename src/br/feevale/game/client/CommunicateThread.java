@@ -29,33 +29,40 @@ public class CommunicateThread extends Thread {
             String receive;
             while ((receive = receive()) != null) {
                 System.out.println("run()" + receive);
-                if ("keyReleased".equals(receive)) {
-                    GamePanel.keyDown = false;
-                    GamePanel.keyUp = false;
-                    GamePanel.keyLeft = false;
-                    GamePanel.keyRight = false;
-                } else if (receive.startsWith("name:")){
+                if (receive.startsWith("name:")) {
                     GamePanel.playerName = receive.split(":")[1];
-                } else if (isKeyPressDown(Integer.valueOf(receive))) {
-                    GamePanel.keyDown = true;
-                    GamePanel.keyUp = false;
-                    GamePanel.keyLeft = false;
-                    GamePanel.keyRight = false;
-                } else if (isKeyPressUp(Integer.valueOf(receive))) {
-                    GamePanel.keyDown = false;
-                    GamePanel.keyUp = true;
-                    GamePanel.keyLeft = false;
-                    GamePanel.keyRight = false;
-                } else if (isKeyPressLeft(Integer.valueOf(receive))) {
-                    GamePanel.keyDown = false;
-                    GamePanel.keyUp = false;
-                    GamePanel.keyLeft = true;
-                    GamePanel.keyRight = false;
-                } else if (isKeyPressRight(Integer.valueOf(receive))) {
-                    GamePanel.keyDown = false;
-                    GamePanel.keyUp = false;
-                    GamePanel.keyLeft = false;
-                    GamePanel.keyRight = true;
+                }
+                
+                String clientName = receive.split(":")[0];
+                String clientCommand = receive.split(":")[1];
+
+                if (GamePanel.playerName.equals(clientName)) {
+                    if ("keyReleased".equals(clientCommand)) {
+                        GamePanel.keyDown = false;
+                        GamePanel.keyUp = false;
+                        GamePanel.keyLeft = false;
+                        GamePanel.keyRight = false;
+                    } else if (isKeyPressDown(Integer.valueOf(clientCommand))) {
+                        GamePanel.keyDown = true;
+                        GamePanel.keyUp = false;
+                        GamePanel.keyLeft = false;
+                        GamePanel.keyRight = false;
+                    } else if (isKeyPressUp(Integer.valueOf(clientCommand))) {
+                        GamePanel.keyDown = false;
+                        GamePanel.keyUp = true;
+                        GamePanel.keyLeft = false;
+                        GamePanel.keyRight = false;
+                    } else if (isKeyPressLeft(Integer.valueOf(clientCommand))) {
+                        GamePanel.keyDown = false;
+                        GamePanel.keyUp = false;
+                        GamePanel.keyLeft = true;
+                        GamePanel.keyRight = false;
+                    } else if (isKeyPressRight(Integer.valueOf(clientCommand))) {
+                        GamePanel.keyDown = false;
+                        GamePanel.keyUp = false;
+                        GamePanel.keyLeft = false;
+                        GamePanel.keyRight = true;
+                    }
                 }
             }
         } catch (Exception e) {
