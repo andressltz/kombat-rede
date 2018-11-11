@@ -5,28 +5,36 @@ import java.awt.*;
 
 public class Player extends JLabel {
 
-    public int x = 0, y = 0;
-    ImageIcon walkL;
-    ImageIcon walkR;
-    ImageIcon walkU;
-    ImageIcon walkD;
+    private static final String CHARACTER_IMAGE = "character.gif";
+
+    public int x = 0;
+    public int y = 0;
+    private ImageIcon walkR;
+    private String playerName;
+
+    public Player() {
+        super(" ", new ImageIcon(), SwingConstants.RIGHT);
+    }
 
     public void setup() {
-        setText("12");
-        walkR = new ImageIcon(new ImageIcon(getClass().getResource("character.gif")).getImage().getScaledInstance(88, 127, Image.SCALE_DEFAULT));
-        setBounds(x, y, 90, 127);
+        walkR = new ImageIcon(new ImageIcon(getClass().getResource(CHARACTER_IMAGE)).getImage().getScaledInstance(88, 127, Image.SCALE_DEFAULT));
+        setBounds(x, y, 110, 127);
         setIcon(walkR);
     }
 
     public void move() {
-        setBounds(x, y, 90, 127);
+        setBounds(x, y, 110, 127);
     }
 
-    public void setIconRight() {
-        setIcon(walkR);
+    public void setPlayerName(String playerName) {
+        System.out.println("setou " + playerName);
+        this.playerName = playerName;
+        setText(playerName);
+        updateUI();
     }
 
-    public void setIconLeft() {
-        setIcon(walkL);
+    public String getPlayerName() {
+        return this.playerName;
     }
+
 }

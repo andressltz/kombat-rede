@@ -15,15 +15,15 @@ public class GamePanel extends javax.swing.JFrame implements Runnable {
     private static final int SERVER_PORT = 8181;
     private static final String SERVER_HOST = "localhost";
 
-    private Player player;
+    public static Player player;
     private PrintWriter writer;
     private Socket socket;
-    private BufferedReader reader;
 
     public static boolean keyRight = false;
     public static boolean keyLeft = false;
     public static boolean keyUp = false;
     public static boolean keyDown = false;
+    public static String playerName = null;
     private boolean isKeyPressed = false;
     private boolean isKeyRealeased = false;
     private int keyPressed;
@@ -37,28 +37,27 @@ public class GamePanel extends javax.swing.JFrame implements Runnable {
             public void run() {
                 GamePanel g = new GamePanel();
                 g.connect();
+//                g.initComponents();
                 g.setSize(800, 600);
-                g.setVisible(true); //TODO: close on error
+                g.setVisible(true);
                 Thread game = new Thread(g);
                 game.start();
             }
         });
     }
 
-    private boolean connect() {
+    private void connect() {
         try {
             socket = new Socket(SERVER_HOST, SERVER_PORT);
             writer = new PrintWriter(socket.getOutputStream());
-            reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
             CommunicateThread c = new CommunicateThread(socket);
             c.communicate();
             c.start();
-            return true;
         } catch (IOException e) {
             e.printStackTrace();
             JOptionPane.showMessageDialog(null, "Erro ao conectar com o servidor: " + e.getLocalizedMessage());
-            return false;
+            System.exit(1);
         }
     }
 
@@ -70,7 +69,6 @@ public class GamePanel extends javax.swing.JFrame implements Runnable {
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
-
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowOpened(java.awt.event.WindowEvent evt) {
@@ -108,6 +106,9 @@ public class GamePanel extends javax.swing.JFrame implements Runnable {
     }
 
     private void updateGame() {
+        if (player != null && playerName != null && !playerName.equals(player.getPlayerName())) {
+            player.setPlayerName(playerName);
+        }
         if (keyRight) {
             player.x += SPEED;
             player.move();

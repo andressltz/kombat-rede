@@ -34,6 +34,8 @@ public class CommunicateThread extends Thread {
                     GamePanel.keyUp = false;
                     GamePanel.keyLeft = false;
                     GamePanel.keyRight = false;
+                } else if (receive.startsWith("name:")){
+                    GamePanel.playerName = receive.split(":")[1];
                 } else if (isKeyPressDown(Integer.valueOf(receive))) {
                     GamePanel.keyDown = true;
                     GamePanel.keyUp = false;
