@@ -1,31 +1,25 @@
 package br.feevale.game.client;
 
 
+import br.feevale.game.context.ContextGame;
+import br.feevale.game.context.ContextPlayer;
+
 import javax.swing.*;
-import java.awt.event.KeyEvent;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.HashMap;
 
 public class GamePanel extends javax.swing.JFrame implements Runnable {
 
-    private static final int SPEED = 4;
     private static final int SERVER_PORT = 8181;
     private static final String SERVER_HOST = "localhost";
 
-    public static Player player;
+    public static HashMap<String, Player> players = new HashMap<>();
+    public static ContextGame contextGame;
     private PrintWriter writer;
     private Socket socket;
-
-    public static boolean keyRight = false;
-    public static boolean keyLeft = false;
-    public static boolean keyUp = false;
-    public static boolean keyDown = false;
-    public static String playerName = null;
     private boolean isKeyPressed = false;
-    private boolean isKeyRealeased = false;
     private int keyPressed;
 
     public GamePanel() {
@@ -36,8 +30,8 @@ public class GamePanel extends javax.swing.JFrame implements Runnable {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 GamePanel g = new GamePanel();
+                contextGame = new ContextGame();
                 g.connect();
-//                g.initComponents();
                 g.setSize(800, 600);
                 g.setVisible(true);
                 Thread game = new Thread(g);
@@ -90,10 +84,11 @@ public class GamePanel extends javax.swing.JFrame implements Runnable {
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowOpened() {
-        player = new Player();
-        player.setup();
-        getContentPane().add(player);
-        repaint();
+//        Player player = new Player();
+//        player.setup();
+//        players.put(" ", player);
+//        getContentPane().add(player);
+//        repaint();
     }
 
     private void formKeyPressed(java.awt.event.KeyEvent evt) {
@@ -102,39 +97,32 @@ public class GamePanel extends javax.swing.JFrame implements Runnable {
     }
 
     private void formKeyReleased() {
-        isKeyRealeased = true;
     }
 
     private void updateGame() {
-        if (player != null && playerName != null && !playerName.equals(player.getPlayerName())) {
-            player.setPlayerName(playerName);
-        }
-        if (keyRight) {
-            player.x += SPEED;
-            player.move();
-        } else if (keyLeft) {
-            player.x -= SPEED;
-            player.move();
-        } else if (keyUp) {
-            player.y -= SPEED;
-            player.move();
-        } else if (keyDown) {
-            player.y += SPEED;
-            player.move();
+        for (ContextPlayer cPlayer : contextGame.getPlayers()) {
+            Player player = players.get(cPlayer.getPlayerName());
+            if (player == null) {
+                player = new Player();
+                player.setup();
+                player.x = cPlayer.getX();
+                player.y = cPlayer.getY();
+                player.setPlayerName(cPlayer.getPlayerName());
+                players.put(cPlayer.getPlayerName(), player);
+                getContentPane().add(player);
+                repaint();
+            } else {
+                player.x = cPlayer.getX();
+                player.y = cPlayer.getY();
+                player.move();
+            }
+
         }
         if (isKeyPressed) {
-            System.out.println("updateGame() - Apertei a tecla " + keyPressed);
+            System.out.println("updateGame() - key pressed " + keyPressed);
             writer.println(keyPressed);
             writer.flush();
             isKeyPressed = false;
-            isKeyRealeased = false;
-        }
-        if (isKeyRealeased) {
-            System.out.println("updateGame() - Soltei a tecla " + keyPressed);
-            writer.println("keyReleased");
-            writer.flush();
-            isKeyPressed = false;
-            isKeyRealeased = false;
         }
     }
 

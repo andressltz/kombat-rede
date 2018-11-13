@@ -12,6 +12,7 @@ public class Player extends JLabel {
     private ImageIcon walkR;
     private String playerName;
 
+
     public Player() {
         super(" ", new ImageIcon(), SwingConstants.RIGHT);
     }
