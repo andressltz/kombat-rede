@@ -10,6 +10,7 @@ public class ContextPlayer {
     private int y = 0;
     private String playerName;
     private int points = 0;
+    private int state = 0; // 0 - normal 1 - attack
 
     public int getX() {
         return x;
@@ -56,7 +57,7 @@ public class ContextPlayer {
 
     @Override
     public String toString() {
-        return "" + playerName + "," + x + "," + y + "";
+        return "" + playerName + "," + x + "," + y + "," + points + "";
     }
 
     private boolean isKeyPressUp(int keyCode) {
@@ -81,5 +82,13 @@ public class ContextPlayer {
 
     public void setPoints(int points) {
         this.points = points;
+    }
+
+    public int getState() {
+        return state;
+    }
+
+    public void setState(int state) {
+        this.state = state;
     }
 }

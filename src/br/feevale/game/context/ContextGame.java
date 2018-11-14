@@ -13,6 +13,14 @@ public class ContextGame {
         players.add(player);
     }
 
+    public void updateContext(String clientName, String command) {
+        for (ContextPlayer player : players) {
+            if (player.getPlayerName().equals(clientName)) {
+                player.updatePlayer(command);
+            }
+        }
+    }
+
 //    @Override
 //    public String toString() {
 //        StringBuilder sb = new StringBuilder();
@@ -46,8 +54,6 @@ public class ContextGame {
     }
 
     public void fromString(String context) {
-//        { "players":[{ "x": "0", "y": "0", "playerName": "A" }]}
-//        0,0,A;0,0,B
         String[] stringPlayer = context.split(";");
         players = new ArrayList<>();
         for (int i = 0; i < stringPlayer.length; i++) {
@@ -56,6 +62,8 @@ public class ContextGame {
             player.setX(Integer.valueOf(vals[1]));
             player.setY(Integer.valueOf(vals[2]));
             player.setPlayerName(vals[0]);
+            player.setPoints(Integer.valueOf(vals[3]));
+            player.setState(Integer.valueOf(vals[4]));
             players.add(player);
         }
     }

@@ -104,9 +104,7 @@ public class GamePanel extends javax.swing.JFrame implements Runnable {
             Player player = players.get(cPlayer.getPlayerName());
             if (player == null) {
                 player = new Player();
-                player.setup();
-                player.x = cPlayer.getX();
-                player.y = cPlayer.getY();
+                player.setup(cPlayer.getX(), cPlayer.getY());
                 player.setPlayerName(cPlayer.getPlayerName());
                 players.put(cPlayer.getPlayerName(), player);
                 getContentPane().add(player);
@@ -114,12 +112,20 @@ public class GamePanel extends javax.swing.JFrame implements Runnable {
             } else {
                 player.x = cPlayer.getX();
                 player.y = cPlayer.getY();
+//                System.out.println(cPlayer.getPlayerName() + " - " + player.state + " - " + cPlayer.getState());
+                if (player.state == 0 && cPlayer.getState() == 1) {
+                    player.attack();
+                    player.state = 1;
+                } else if (player.state == 1 && cPlayer.getState() == 0) {
+                    player.normal();
+                    player.state = 0;
+                }
                 player.move();
             }
 
         }
         if (isKeyPressed) {
-            System.out.println("updateGame() - key pressed " + keyPressed);
+//            System.out.println("updateGame() - key pressed " + keyPressed);
             writer.println(keyPressed);
             writer.flush();
             isKeyPressed = false;
