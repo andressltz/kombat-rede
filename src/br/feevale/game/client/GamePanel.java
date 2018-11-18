@@ -16,6 +16,7 @@ public class GamePanel extends javax.swing.JFrame implements Runnable {
     private static final String SERVER_HOST = "localhost";
 
     public static HashMap<String, Player> players = new HashMap<>();
+    public static HashMap<String, Score> scores = new HashMap<>();
     public static ContextGame contextGame;
     private PrintWriter writer;
     private Socket socket;
@@ -100,19 +101,24 @@ public class GamePanel extends javax.swing.JFrame implements Runnable {
     }
 
     private void updateGame() {
+        int i = 0;
         for (ContextPlayer cPlayer : contextGame.getPlayers()) {
             Player player = players.get(cPlayer.getPlayerName());
+            Score score = scores.get(cPlayer.getPlayerName());
             if (player == null) {
                 player = new Player();
                 player.setup(cPlayer.getX(), cPlayer.getY());
                 player.setPlayerName(cPlayer.getPlayerName());
                 players.put(cPlayer.getPlayerName(), player);
                 getContentPane().add(player);
+                score = new Score(cPlayer.getPoints(), cPlayer.getPlayerName(), i);
+                scores.put(cPlayer.getPlayerName(), score);
+                getContentPane().add(score);
                 repaint();
             } else {
                 player.x = cPlayer.getX();
                 player.y = cPlayer.getY();
-//                System.out.println(cPlayer.getPlayerName() + " - " + player.state + " - " + cPlayer.getState());
+                score.score = cPlayer.getPoints();
                 if (player.state == 0 && cPlayer.getState() == 1) {
                     player.attack();
                     player.state = 1;
@@ -121,8 +127,9 @@ public class GamePanel extends javax.swing.JFrame implements Runnable {
                     player.state = 0;
                 }
                 player.move();
+                score.upd();
             }
-
+            i++;
         }
         if (isKeyPressed) {
 //            System.out.println("updateGame() - key pressed " + keyPressed);
@@ -141,6 +148,26 @@ public class GamePanel extends javax.swing.JFrame implements Runnable {
             }
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    public class Score extends JLabel {
+        public int score = 0;
+        public String playerName;
+
+        public Score(int score, String playerName, int i) {
+            super(" ", SwingConstants.LEFT);
+            int vert = -50 + (i * 10);
+            setBounds(10, vert, 110, 127);
+            this.score = score;
+            this.playerName = playerName;
+            setText("Jogador " + playerName + ": " + score);
+            updateUI();
+        }
+
+        public void upd() {
+            setText("Jogador " + playerName + ": " + score);
+            updateUI();
         }
     }
 
