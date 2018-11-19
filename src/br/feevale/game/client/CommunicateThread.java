@@ -7,8 +7,8 @@ import java.net.Socket;
 
 public class CommunicateThread extends Thread {
 
-    BufferedReader reader;
-    Socket socket;
+    private BufferedReader reader;
+    private Socket socket;
 
     public CommunicateThread(Socket s) {
         this.socket = s;
@@ -29,42 +29,6 @@ public class CommunicateThread extends Thread {
             while ((receive = receive()) != null) {
                 System.out.println("context: " + receive);
                 GamePanel.contextGame.fromString(receive);
-
-//                if (receive.startsWith("name:")) {
-//                    GamePanel.playerName = receive.split(":")[1];
-//                }
-//
-//                String clientName = receive.split(":")[0];
-//                String clientCommand = receive.split(":")[1];
-
-//                if (GamePanel.playerName.equals(clientName)) {
-//                    if ("keyReleased".equals(clientCommand)) {
-//                        GamePanel.keyDown = false;
-//                        GamePanel.keyUp = false;
-//                        GamePanel.keyLeft = false;
-//                        GamePanel.keyRight = false;
-//                    } else if (isKeyPressDown(Integer.valueOf(clientCommand))) {
-//                        GamePanel.keyDown = true;
-//                        GamePanel.keyUp = false;
-//                        GamePanel.keyLeft = false;
-//                        GamePanel.keyRight = false;
-//                    } else if (isKeyPressUp(Integer.valueOf(clientCommand))) {
-//                        GamePanel.keyDown = false;
-//                        GamePanel.keyUp = true;
-//                        GamePanel.keyLeft = false;
-//                        GamePanel.keyRight = false;
-//                    } else if (isKeyPressLeft(Integer.valueOf(clientCommand))) {
-//                        GamePanel.keyDown = false;
-//                        GamePanel.keyUp = false;
-//                        GamePanel.keyLeft = true;
-//                        GamePanel.keyRight = false;
-//                    } else if (isKeyPressRight(Integer.valueOf(clientCommand))) {
-//                        GamePanel.keyDown = false;
-//                        GamePanel.keyUp = false;
-//                        GamePanel.keyLeft = false;
-//                        GamePanel.keyRight = true;
-//                    }
-//                }
             }
         } catch (Exception e) {
             e.printStackTrace();

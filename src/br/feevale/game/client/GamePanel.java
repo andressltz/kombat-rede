@@ -10,16 +10,15 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.HashMap;
 
-public class GamePanel extends javax.swing.JFrame implements Runnable {
+public class GamePanel extends JFrame implements Runnable {
 
     private static final int SERVER_PORT = 8181;
     private static final String SERVER_HOST = "localhost";
 
-    public static HashMap<String, Player> players = new HashMap<>();
-    public static HashMap<String, Score> scores = new HashMap<>();
+    private static HashMap<String, Player> players = new HashMap<>();
+    private static HashMap<String, Score> scores = new HashMap<>();
     public static ContextGame contextGame;
     private PrintWriter writer;
-    private Socket socket;
     private boolean isKeyPressed = false;
     private int keyPressed;
 
@@ -43,7 +42,7 @@ public class GamePanel extends javax.swing.JFrame implements Runnable {
 
     private void connect() {
         try {
-            socket = new Socket(SERVER_HOST, SERVER_PORT);
+            Socket socket = new Socket(SERVER_HOST, SERVER_PORT);
             writer = new PrintWriter(socket.getOutputStream());
 
             CommunicateThread c = new CommunicateThread(socket);
@@ -85,11 +84,6 @@ public class GamePanel extends javax.swing.JFrame implements Runnable {
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowOpened() {
-//        Player player = new Player();
-//        player.setup();
-//        players.put(" ", player);
-//        getContentPane().add(player);
-//        repaint();
     }
 
     private void formKeyPressed(java.awt.event.KeyEvent evt) {
@@ -109,6 +103,7 @@ public class GamePanel extends javax.swing.JFrame implements Runnable {
                 player = new Player();
                 player.setup(cPlayer.getX(), cPlayer.getY());
                 player.setPlayerName(cPlayer.getPlayerName());
+                player.state = cPlayer.getState();
                 players.put(cPlayer.getPlayerName(), player);
                 getContentPane().add(player);
                 score = new Score(cPlayer.getPoints(), cPlayer.getPlayerName(), i);
@@ -119,13 +114,7 @@ public class GamePanel extends javax.swing.JFrame implements Runnable {
                 player.x = cPlayer.getX();
                 player.y = cPlayer.getY();
                 score.score = cPlayer.getPoints();
-                if (player.state == 0 && cPlayer.getState() == 1) {
-                    player.attack();
-                    player.state = 1;
-                } else if (player.state == 1 && cPlayer.getState() == 0) {
-                    player.normal();
-                    player.state = 0;
-                }
+                player.state = cPlayer.getState();
                 player.move();
                 score.upd();
             }
@@ -157,8 +146,7 @@ public class GamePanel extends javax.swing.JFrame implements Runnable {
 
         public Score(int score, String playerName, int i) {
             super(" ", SwingConstants.LEFT);
-            int vert = -50 + (i * 10);
-            setBounds(10, vert, 110, 127);
+            setBounds(10, -50 + (i * 20), 110, 127);
             this.score = score;
             this.playerName = playerName;
             setText("Jogador " + playerName + ": " + score);

@@ -10,7 +10,7 @@ public class ContextPlayer {
     private int y = 0;
     private String playerName;
     private int points = 0;
-    private int state = 0; // 0 - normal 1 - attack
+    private State state = State.NORMAL_RIGHT;
 
     public int getX() {
         return x;
@@ -85,10 +85,10 @@ public class ContextPlayer {
     }
 
     public int getState() {
-        return state;
+        return state.getState();
     }
 
     public void setState(int state) {
-        this.state = state;
+        this.state = State.values()[state];
     }
 }
